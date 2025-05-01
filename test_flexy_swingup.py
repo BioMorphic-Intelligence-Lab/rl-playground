@@ -8,7 +8,6 @@ from env import SoftPendulumBalanceEnv
 def read_po():
     parser = argparse.ArgumentParser(description="Testing the pendulum swingup")
     parser.add_argument('--record', action='store_true', help="Flag on whether to record a video of the simulation")
-    parser.add_argument('--vis', action='store_true', help="Flag on whether to visualize the simulation")
     parser.add_argument('--n_envs', type=int, default=12, help="Number of parallel environmnents")
     return parser.parse_args()
 
@@ -36,7 +35,7 @@ def main():
     args = read_po()
     
     model = PPO.load("flexy_swingup_model.zip")
-    env = SoftPendulumBalanceEnv(num_envs=args.n_envs, vis=args.vis, max_steps=3000, reset_on_completion=False, dt=0.01)
+    env = SoftPendulumBalanceEnv(num_envs=args.n_envs, vis=True, max_steps=3000, reset_on_completion=False, dt=0.01)
     obs = env.reset()
     a = np.zeros([env.num_envs, 1], dtype=np.float32)
 
