@@ -5,6 +5,8 @@ import numpy as np
 from stable_baselines3.common.vec_env import VecEnv
 
 class PendulumBalanceEnv(VecEnv):
+
+    ##### VecEnv Overrides ####################
     def __init__(self, vis, device='cpu',
                  max_steps=2000,
                  max_torque=5, max_speed=15, num_envs=10,
@@ -136,33 +138,6 @@ class PendulumBalanceEnv(VecEnv):
 
         return self._get_observation(), rewards, dones, infos
     
-    def _set_state(self, theta, theta_dot=None):
-
-        if theta_dot is None:
-            theta_dot = np.zeros(self.num_envs)
-
-        assert len(theta) == self.num_envs, "Wrong number of positions given!"
-        assert len(theta_dot) == self.num_envs, "Wrong number of velocities given!"
-
-        # Set angular position
-        self.pendulum.set_dofs_position(theta, envs_idx=self.envs_idx)
-        # Set angular velocity
-        self.pendulum.set_dofs_velocity(theta_dot, envs_idx=self.envs_idx)
-
-    def _get_state(self):
-        theta = self.pendulum.get_dofs_position()
-        theta = np.arctan2(np.sin(theta), np.cos(theta))
-        theta_dot = self.pendulum.get_dofs_velocity()
-        return np.concatenate((theta, theta_dot), axis=1)
-    
-    def _get_observation(self):
-            angle = self.pendulum.get_dofs_position()
-            return np.concatenate([
-                 np.cos(angle),
-                 np.sin(angle),
-                 self.pendulum.get_dofs_velocity() / self.max_speed], 
-                 axis=1)
-    
     def close(self):
         pass
     
@@ -182,6 +157,9 @@ class PendulumBalanceEnv(VecEnv):
     def env_is_wrapped(self, wrapper_class, indices=None):
         return [False]*self.num_envs
     
+
+    ##### Additional methods ###################
+
     def set_positions(self, spacing=1.5):
         num_per_side = int(np.ceil(np.sqrt(self.num_envs)))  # Number of rows/cols
         x_idx, y_idx = np.meshgrid(range(num_per_side), range(num_per_side))
@@ -216,3 +194,31 @@ class PendulumBalanceEnv(VecEnv):
             angular_pos = self.pendulum.get_dofs_position()
             angular_vel = self.pendulum.get_dofs_velocity()
             print(f"Step {t}: Position={angular_pos}, Velocity={angular_vel}")
+
+    def _set_state(self, theta, theta_dot=None):
+
+        if theta_dot is None:
+            theta_dot = np.zeros(self.num_envs)
+
+        assert len(theta) == self.num_envs, "Wrong number of positions given!"
+        assert len(theta_dot) == self.num_envs, "Wrong number of velocities given!"
+
+        # Set angular position
+        self.pendulum.set_dofs_position(theta, envs_idx=self.envs_idx)
+        # Set angular velocity
+        self.pendulum.set_dofs_velocity(theta_dot, envs_idx=self.envs_idx)
+
+    def _get_state(self):
+        theta = self.pendulum.get_dofs_position()
+        theta = np.arctan2(np.sin(theta), np.cos(theta))
+        theta_dot = self.pendulum.get_dofs_velocity()
+        return np.concatenate((theta, theta_dot), axis=1)
+    
+    def _get_observation(self):
+            angle = self.pendulum.get_dofs_position()
+            return np.concatenate([
+                 np.cos(angle),
+                 np.sin(angle),
+                 self.pendulum.get_dofs_velocity() / self.max_speed], 
+                 axis=1)
+    

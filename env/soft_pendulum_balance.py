@@ -33,7 +33,7 @@ class SoftPendulumBalanceEnv(VecEnv):
         self.scene = gs.Scene(
             viewer_options=
             gs.options.ViewerOptions(
-                camera_pos=(0.0, 20.0, 5),
+                camera_pos=(0.0, 15.0, 1.5),
                 camera_lookat=(0.0, 0.0, 0.5),
                 camera_fov=30,
                 res=(960, 640),
@@ -45,7 +45,7 @@ class SoftPendulumBalanceEnv(VecEnv):
 
         self.cam = self.scene.add_camera(
                 res    = (1280, 960),
-                pos    = (0.0, 20.0, 5),
+                pos    = (0.0, 15.0, 1.5),
                 lookat = (0.0, 0.0, 0.5),
                 fov    = 30,
                 GUI    = False
